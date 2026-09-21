@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/src/lib/auth-context";
+import { NotificationBell } from "@/src/components/notification-bell";
 
 export function Navbar() {
   const { user, loading, logout } = useAuth();
@@ -78,6 +79,7 @@ export function Navbar() {
                   Admin
                 </Link>
               )}
+              <NotificationBell />
               <span className="text-neutral-400">|</span>
               <span className="text-neutral-700">{user.name}</span>
               <button

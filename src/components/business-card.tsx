@@ -15,10 +15,8 @@ export function BusinessCard({ business }: { business: Business }) {
           </span>
         )}
       </div>
-      {business.category?.name && (
-        <span className="text-xs text-neutral-500">
-          {business.category.name}
-        </span>
+      {business.category && (
+        <span className="text-xs text-neutral-500">{business.category}</span>
       )}
       {business.description && (
         <p className="mt-1 line-clamp-2 text-sm text-neutral-600">

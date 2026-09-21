@@ -12,7 +12,7 @@ import {
 } from "@/src/lib/cart-storage";
 import { ErrorBanner, TextField } from "@/src/components/ui/field";
 import { Button } from "@/src/components/ui/button";
-import type { Business, Order, Product } from "@/src/types";
+import type { Business, OrderDetail, Product } from "@/src/types";
 
 export default function BusinessDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -24,7 +24,7 @@ export default function BusinessDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [cartOrder, setCartOrderState] = useState<Order | null>(null);
+  const [cartOrder, setCartOrderState] = useState<OrderDetail | null>(null);
   const [addingProductId, setAddingProductId] = useState<number | null>(null);
   const [cartError, setCartError] = useState<string | null>(null);
 
@@ -40,12 +40,7 @@ export default function BusinessDetailPage() {
     Promise.all([businessesApi.get(id), productsApi.listByBusiness(id)])
       .then(([b, p]) => {
         setBusiness(b);
-
-        console.log("Respuesta de productos:", p);
-
-        const productsArray = Array.isArray(p) ? p : p.data || p.products || [];
-
-        setProducts(productsArray);
+        setProducts(p.data);
       })
       .catch((err) =>
         setError(
@@ -57,7 +52,6 @@ export default function BusinessDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // Si ya había un carrito abierto para este negocio, lo recuperamos.
   useEffect(() => {
     if (!user || user.role !== "customer") return;
     const orderId = getCartOrderId(id);
@@ -97,8 +91,7 @@ export default function BusinessDetailPage() {
   };
 
   const useMyLocation = () => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition((pos) => {
+    navigator.geolocation?.getCurrentPosition((pos) => {
       setDeliveryLat(String(pos.coords.latitude));
       setDeliveryLng(String(pos.coords.longitude));
     });
@@ -124,7 +117,9 @@ export default function BusinessDetailPage() {
       setPendingProductId(null);
     } catch (err) {
       setCartError(
-        err instanceof ApiError ? err.message : "No se pudo crear el pedido.",
+        err instanceof ApiError
+          ? err.message
+          : "No se pudo crear el pedido. Verificá que el negocio entregue en esa ubicación.",
       );
     } finally {
       setAddingProductId(null);
@@ -173,9 +168,7 @@ export default function BusinessDetailPage() {
           <h1 className="text-2xl font-bold text-neutral-900">
             {business.name}
           </h1>
-          {business.category?.name && (
-            <p className="text-sm text-neutral-500">{business.category.name}</p>
-          )}
+          <p className="text-sm text-neutral-500">{business.category}</p>
           {business.description && (
             <p className="mt-2 text-neutral-700">{business.description}</p>
           )}
@@ -220,7 +213,7 @@ export default function BusinessDetailPage() {
                 )}
                 <div className="mt-2 flex items-center justify-between">
                   <span className="font-semibold text-emerald-700">
-                    ${Number(product.price).toFixed(2)}
+                    ${product.price.toFixed(2)}
                   </span>
                   <span
                     className={`text-xs ${product.available ? "text-neutral-500" : "text-red-500"}`}
@@ -307,24 +300,25 @@ export default function BusinessDetailPage() {
             {cartOrder && !showDeliveryForm && (
               <>
                 <div className="mt-3 divide-y divide-neutral-100">
-                  {cartOrder.order_items?.map((item) => (
+                  {cartOrder.items.map((item) => (
                     <div
-                      key={item.id}
+                      key={item.product_id}
                       className="flex justify-between py-2 text-sm"
                     >
                       <span>
-                        {item.quantity}×{" "}
-                        {item.product?.name ?? `Producto #${item.product_id}`}
+                        {item.quantity}× {item.name}
                       </span>
-                      <span>
-                        ${Number(item.subtotal ?? item.unit_price).toFixed(2)}
-                      </span>
+                      <span>${item.subtotal.toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
-                <div className="mt-2 flex justify-between border-t border-neutral-200 pt-2 font-semibold">
+                <div className="mt-2 flex justify-between text-sm text-neutral-500">
+                  <span>Envío</span>
+                  <span>${cartOrder.delivery_fee.toFixed(2)}</span>
+                </div>
+                <div className="mt-1 flex justify-between border-t border-neutral-200 pt-2 font-semibold">
                   <span>Total</span>
-                  <span>${Number(cartOrder.total ?? 0).toFixed(2)}</span>
+                  <span>${cartOrder.total_with_delivery.toFixed(2)}</span>
                 </div>
                 <div className="mt-4 flex gap-2">
                   <Button className="flex-1" onClick={handleConfirm}>

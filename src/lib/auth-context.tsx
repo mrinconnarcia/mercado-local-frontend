@@ -29,35 +29,22 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-
-  // 🟢 SOLUCIÓN: Calculamos el estado inicial de forma segura.
-  // Esto se ejecuta UNA sola vez al montar, evitando el doble render.
-  const [loading, setLoading] = useState(() => {
-    if (typeof window !== "undefined") {
-      // Si NO hay token, no necesitamos "cargar" nada (false).
-      // Si HAY token, sí necesitamos cargar los datos del usuario (true).
-      return !getToken();
-    }
-    // Durante la renderización en el servidor (SSR), asumimos que está cargando por seguridad
-    return true;
-  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = getToken();
-
-    // 🟢 Solo hacemos la petición si existe un token.
-    // Si no hay token, `loading` ya es `false` gracias al estado inicial,
-    // por lo que YA NO necesitamos llamar a setLoading(false) aquí.
-    if (token) {
-      authApi
-        .me()
-        .then(setUser)
-        .catch(() => {
-          clearToken();
-          setUser(null); // Buena práctica: asegurar que el usuario sea null si falla
-        })
-        .finally(() => setLoading(false));
+    if (!token) {
+      setLoading(false);
+      return;
     }
+    authApi
+      .me()
+      .then(setUser)
+      .catch((err) => {
+        console.error("[auth] Falló GET /me, se borra el token guardado:", err);
+        clearToken();
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
@@ -88,9 +75,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     try {
       await authApi.logout();
+    } catch (err) {
+      console.error(
+        "[auth] Falló DELETE /logout (igual se limpia la sesión local):",
+        err,
+      );
     } finally {
       clearToken();
-      setUser(null);
+      setUser(null); // ← ya sin clearMyBusinessId()
     }
   }, []);
 

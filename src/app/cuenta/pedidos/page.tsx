@@ -13,12 +13,15 @@ export default function MyOrdersPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!ready) return;
-    ordersApi
-      .list()
-      .then(setOrders)
-      .finally(() => setLoading(false));
-  }, [ready]);
+  if (!ready) return;
+  ordersApi
+    .list()
+    .then((res) => {
+      const list = Array.isArray(res) ? res : res?.data ?? [];
+      setOrders(list);
+    })
+    .finally(() => setLoading(false));
+}, [ready]);
 
   if (!ready) return <p className="px-4 py-8 text-neutral-500">Cargando...</p>;
 
@@ -44,7 +47,7 @@ export default function MyOrdersPage() {
               >
                 <div>
                   <p className="font-medium text-neutral-900">
-                    {order.business?.name ?? `Negocio #${order.business_id}`}
+                    {order.business?.name ?? `Negocio #${order.bis}`}
                   </p>
                   <p className="text-xs text-neutral-500">Pedido #{order.id}</p>
                 </div>

@@ -8,13 +8,13 @@ import { ApiError } from "@/src/lib/api";
 import { OrderStatusBadge } from "@/src/components/order-status-badge";
 import { Button } from "@/src/components/ui/button";
 import { ErrorBanner, TextareaField } from "@/src/components/ui/field";
-import type { Order } from "@/src/types";
+import type { OrderDetail } from "@/src/types";
 
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { ready } = useRequireRole(["customer"]);
 
-  const [order, setOrder] = useState<Order | null>(null);
+  const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -88,7 +88,8 @@ export default function OrderDetailPage() {
     );
   if (!order) return null;
 
-  const canCancel = ["pending", "confirmed", "accepted"].includes(order.status);
+  const canCancel =
+    order.status !== "delivered" && order.status !== "cancelled";
   const canReview = order.status === "delivered" && !reviewSent;
 
   return (
@@ -99,9 +100,7 @@ export default function OrderDetailPage() {
         </h1>
         <OrderStatusBadge status={order.status} />
       </div>
-      <p className="mt-1 text-sm text-neutral-500">
-        {order.business?.name ?? `Negocio #${order.business_id}`}
-      </p>
+      <p className="mt-1 text-sm text-neutral-500">{order.business}</p>
 
       {error && (
         <div className="mt-4">
@@ -110,35 +109,28 @@ export default function OrderDetailPage() {
       )}
 
       <div className="mt-6 divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-white">
-        {order.order_items?.map((item) => (
+        {order.items.map((item) => (
           <div
-            key={item.id}
+            key={item.product_id}
             className="flex items-center justify-between px-4 py-3 text-sm"
           >
             <span>
-              {item.quantity}×{" "}
-              {item.product?.name ?? `Producto #${item.product_id}`}
+              {item.quantity}× {item.name}
             </span>
             <span className="text-neutral-600">
-              ${Number(item.subtotal ?? item.unit_price).toFixed(2)}
+              ${item.subtotal.toFixed(2)}
             </span>
           </div>
         ))}
         <div className="flex items-center justify-between px-4 py-3 text-sm">
           <span className="text-neutral-500">Envío</span>
-          <span>${Number(order.delivery_fee ?? 0).toFixed(2)}</span>
+          <span>${order.delivery_fee.toFixed(2)}</span>
         </div>
         <div className="flex items-center justify-between px-4 py-3 font-semibold">
           <span>Total</span>
-          <span>${Number(order.total ?? 0).toFixed(2)}</span>
+          <span>${order.total_with_delivery.toFixed(2)}</span>
         </div>
       </div>
-
-      {order.delivery_address && (
-        <p className="mt-4 text-sm text-neutral-500">
-          Entrega en: {order.delivery_address}
-        </p>
-      )}
 
       {canCancel && (
         <div className="mt-6">

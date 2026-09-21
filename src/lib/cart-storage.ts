@@ -31,3 +31,8 @@ export function clearCartOrderId(businessId: number | string): void {
   delete map[String(businessId)];
   window.localStorage.setItem(KEY, JSON.stringify(map));
 }
+
+/** Todos los order_id "en curso" (no confirmados) guardados localmente, de cualquier negocio. */
+export function getAllActiveCartOrderIds(): number[] {
+  return Object.values(readMap());
+}
