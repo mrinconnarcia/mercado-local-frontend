@@ -14,9 +14,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
 }
 
-export function Button({ variant = "primary", loading, disabled, className = "", children, ...rest }: ButtonProps) {
+export function Button({type = "button", variant = "primary", loading, disabled, className = "", children, ...rest }: ButtonProps) {
   return (
     <button
+      type={type}
       className={`inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed ${variantClasses[variant]} ${className}`}
       disabled={disabled || loading}
       {...rest}

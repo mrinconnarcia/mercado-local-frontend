@@ -5,23 +5,23 @@ import { useEffect, useState } from "react";
 import { ordersApi } from "@/src/lib/endpoints";
 import { useRequireRole } from "@/src/lib/use-require-role";
 import { OrderStatusBadge } from "@/src/components/order-status-badge";
-import type { Order } from "@/src/types";
+import type { OrderListItem } from "@/src/types";
 
 export default function MyOrdersPage() {
   const { ready } = useRequireRole(["customer"]);
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<OrderListItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  if (!ready) return;
-  ordersApi
-    .list()
-    .then((res) => {
-      const list = Array.isArray(res) ? res : res?.data ?? [];
-      setOrders(list);
-    })
-    .finally(() => setLoading(false));
-}, [ready]);
+    if (!ready) return;
+    ordersApi
+      .list()
+      .then((res) => {
+        const list = Array.isArray(res) ? res : (res?.data ?? []);
+        setOrders(list);
+      })
+      .finally(() => setLoading(false));
+  }, [ready]);
 
   if (!ready) return <p className="px-4 py-8 text-neutral-500">Cargando...</p>;
 
@@ -47,16 +47,24 @@ export default function MyOrdersPage() {
               >
                 <div>
                   <p className="font-medium text-neutral-900">
-                    {order.business?.name ?? `Negocio #${order.bis}`}
+                    {typeof order.business === "object"
+                      ? order.business.name
+                      : `Negocio #${order.id}`}
                   </p>
                   <p className="text-xs text-neutral-500">Pedido #{order.id}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  {order.total != null && (
-                    <span className="font-semibold text-neutral-800">
-                      ${Number(order.total).toFixed(2)}
+                  {/* ✅ CAMBIO: Mostrar total con envío */}
+                  <div className="text-right">
+                    <span className="block font-semibold text-neutral-800">
+                      ${(order.total_with_delivery ?? order.total).toFixed(2)}
                     </span>
-                  )}
+                    {order.discount && order.discount > 0 && (
+                      <span className="block text-xs text-emerald-600">
+                        Con descuento
+                      </span>
+                    )}
+                  </div>
                   <OrderStatusBadge status={order.status} />
                 </div>
               </Link>

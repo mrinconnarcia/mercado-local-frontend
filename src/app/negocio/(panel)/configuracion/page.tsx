@@ -25,6 +25,7 @@ export default function BusinessConfigPage() {
   const [baseFee, setBaseFee] = useState("");
   const [feePerKm, setFeePerKm] = useState("");
   const [freeOver, setFreeOver] = useState("");
+  const [discountPercentage, setDiscountPercentage] = useState("");
 
   const [savingInfo, setSavingInfo] = useState(false);
   const [savingDelivery, setSavingDelivery] = useState(false);
@@ -37,6 +38,14 @@ export default function BusinessConfigPage() {
     setDescription(business.description ?? "");
     setAddress(business.address ?? "");
     setPhone(business.phone ?? "");
+
+    setLatitude(business.latitude?.toString() ?? "");
+    setLongitude(business.longitude?.toString() ?? "");
+    setRadiusKm(business.delivery_radius_km?.toString() ?? "");
+    setBaseFee(business.delivery_base_fee?.toString() ?? "");
+    setFeePerKm(business.delivery_fee_per_km?.toString() ?? "");
+    setFreeOver(business.free_delivery_over?.toString() ?? "");
+    setDiscountPercentage(business.discount_percentage?.toString() ?? "0");
   }, [business]);
 
   const handleSaveInfo = async (e: FormEvent) => {
@@ -74,16 +83,24 @@ export default function BusinessConfigPage() {
     setSavingDelivery(true);
     setError(null);
     setSuccess(null);
+
     try {
-      await businessesApi.update(business.id, {
-        latitude,
-        longitude,
-        delivery_radius_km: radiusKm ? Number(radiusKm) : undefined,
-        delivery_base_fee: baseFee ? Number(baseFee) : undefined,
-        delivery_fee_per_km: feePerKm ? Number(feePerKm) : undefined,
-        free_delivery_over: freeOver ? Number(freeOver) : undefined,
-      });
-      setSuccess("Configuración de envío actualizada.");
+      const payload: any = {};
+
+      if (latitude) payload.latitude = latitude;
+      if (longitude) payload.longitude = longitude;
+      if (radiusKm) payload.delivery_radius_km = Number(radiusKm);
+      if (baseFee) payload.delivery_base_fee = Number(baseFee);
+      if (feePerKm) payload.delivery_fee_per_km = Number(feePerKm);
+      if (freeOver) payload.free_delivery_over = Number(freeOver);
+      if (discountPercentage)
+        payload.discount_percentage = Number(discountPercentage);
+
+      console.log("Enviando payload:", payload);
+
+      await businessesApi.update(business.id, payload);
+      setSuccess("Configuración de envío y descuento actualizada.");
+      refresh();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "No se pudo guardar.");
     } finally {
@@ -147,11 +164,6 @@ export default function BusinessConfigPage() {
         <h2 className="font-semibold text-neutral-900">
           Zona y costo de envío
         </h2>
-        <p className="text-xs text-neutral-500">
-          Tu API no devuelve estos valores al consultar el negocio, así que este
-          formulario siempre arranca en blanco — no se borraron, simplemente no
-          se pueden leer de vuelta con el endpoint actual.
-        </p>
         <div className="flex gap-3">
           <TextField
             id="c_lat"
@@ -206,8 +218,29 @@ export default function BusinessConfigPage() {
           value={freeOver}
           onChange={(e) => setFreeOver(e.target.value)}
         />
+
+        <div className="border-t border-neutral-200 pt-4 mt-2">
+          <h3 className="font-medium text-neutral-900 mb-3">
+            Descuento general del negocio
+          </h3>
+          <p className="text-xs text-neutral-500 mb-3">
+            Aplica un descuento porcentual a todos los pedidos. Ej: 10 significa
+            10% de descuento.
+          </p>
+          <TextField
+            id="c_discount"
+            label="Porcentaje de descuento (%)"
+            type="number"
+            min="0"
+            max="100"
+            step="0.01"
+            value={discountPercentage}
+            onChange={(e) => setDiscountPercentage(e.target.value)}
+          />
+        </div>
+
         <Button type="submit" loading={savingDelivery} className="w-fit">
-          Guardar envío
+          Guardar envío y descuento
         </Button>
       </form>
     </div>

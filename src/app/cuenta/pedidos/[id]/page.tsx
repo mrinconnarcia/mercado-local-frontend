@@ -39,6 +39,7 @@ export default function OrderDetailPage() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (ready) load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, id]);
@@ -100,7 +101,7 @@ export default function OrderDetailPage() {
         </h1>
         <OrderStatusBadge status={order.status} />
       </div>
-      <p className="mt-1 text-sm text-neutral-500">{order.business}</p>
+      <p className="mt-1 text-sm text-neutral-500">{order.business.toString()}</p>
 
       {error && (
         <div className="mt-4">
@@ -114,7 +115,7 @@ export default function OrderDetailPage() {
             key={item.product_id}
             className="flex items-center justify-between px-4 py-3 text-sm"
           >
-            <span>
+            <span className="text-neutral-500">
               {item.quantity}× {item.name}
             </span>
             <span className="text-neutral-600">
@@ -124,11 +125,11 @@ export default function OrderDetailPage() {
         ))}
         <div className="flex items-center justify-between px-4 py-3 text-sm">
           <span className="text-neutral-500">Envío</span>
-          <span>${order.delivery_fee.toFixed(2)}</span>
+          <span className="text-neutral-600">${order.delivery_fee.toFixed(2)}</span>
         </div>
         <div className="flex items-center justify-between px-4 py-3 font-semibold">
-          <span>Total</span>
-          <span>${order.total_with_delivery.toFixed(2)}</span>
+          <span className="text-neutral-500">Total</span>
+          <span className="text-neutral-600">${order.total_with_delivery.toFixed(2)}</span>
         </div>
       </div>
 

@@ -28,6 +28,23 @@ export interface Business {
   description?: string | null;
   phone?: string | null;
   owner_id?: number;
+  delivery_radius_km?: number;
+  delivery_base_fee?: number;
+  delivery_fee_per_km?: number;
+  free_delivery_over?: number;
+  discount_percentage?: number;
+}
+
+export interface BusinessOrder {
+  id: number;
+  status: OrderStatus;
+  total: number;
+  delivery_fee?: number; // ✅ AGREGAR
+  total_with_delivery?: number; // ✅ AGREGAR
+  discount?: number; // ✅ AGREGAR
+  customer: string;
+  created_at: string;
+  items?: BusinessOrderItem[];
 }
 
 export interface BusinessPayload {
@@ -42,6 +59,7 @@ export interface BusinessPayload {
   delivery_base_fee?: number;
   delivery_fee_per_km?: number;
   free_delivery_over?: number;
+  discount_percentage?: number;
 }
 
 export interface Product {
@@ -78,9 +96,11 @@ export interface OrderListItem {
   status: OrderStatus;
   total: number;
   delivery_fee: number;
+  discount?: number;
   total_with_delivery: number;
-  business: string; // solo el nombre
+  business: string | { name: string };
   created_at: string;
+  bis?: string | number;
 }
 
 export interface OrderItemDetail {

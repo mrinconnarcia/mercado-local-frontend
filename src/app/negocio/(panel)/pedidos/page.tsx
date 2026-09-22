@@ -43,6 +43,7 @@ export default function BusinessOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actingId, setActingId] = useState<number | null>(null);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const load = () => {
     if (!business) return;
@@ -91,7 +92,11 @@ export default function BusinessOrdersPage() {
           <button
             key={f.value}
             onClick={() => setFilter(f.value)}
-            className={`rounded-full px-3 py-1 text-xs font-medium ${filter === f.value ? "bg-emerald-600 text-white" : "bg-neutral-100 text-neutral-600"}`}
+            className={`rounded-full px-3 py-1 text-xs font-medium ${
+              filter === f.value
+                ? "bg-emerald-600 text-white"
+                : "bg-neutral-100 text-neutral-600"
+            }`}
           >
             {f.label}
           </button>
@@ -114,6 +119,9 @@ export default function BusinessOrdersPage() {
             const next = NEXT_STATUS[order.status];
             const showCancel =
               order.status !== "delivered" && order.status !== "cancelled";
+            const isExpanded = expandedId === order.id;
+            const total = order.total_with_delivery ?? order.total;
+
             return (
               <div
                 key={order.id}
@@ -130,7 +138,7 @@ export default function BusinessOrdersPage() {
                   </div>
                   <div className="text-right">
                     <span className="block font-semibold text-neutral-800">
-                      ${order.total.toFixed(2)}
+                      ${total.toFixed(2)}
                     </span>
                     <span className="text-xs text-neutral-500">
                       {STATUS_LABEL[order.status]}
@@ -138,14 +146,65 @@ export default function BusinessOrdersPage() {
                   </div>
                 </div>
 
-                {order.items && (
-                  <ul className="mt-2 text-sm text-neutral-600">
-                    {order.items.map((item, i) => (
-                      <li key={i}>
-                        {item.quantity}× {item.name}
-                      </li>
-                    ))}
-                  </ul>
+                {order.items && order.items.length > 0 && (
+                  <button
+                    onClick={() => setExpandedId(isExpanded ? null : order.id)}
+                    className="mt-2 text-xs text-emerald-700 hover:underline"
+                  >
+                    {isExpanded ? "Ocultar detalles" : "Ver detalles"}
+                  </button>
+                )}
+
+                {isExpanded && order.items && (
+                  <div className="mt-3 border-t border-neutral-100 pt-3">
+                    <ul className="text-sm text-neutral-600 space-y-1">
+                      {order.items.map((item, i) => (
+                        <li key={i} className="flex justify-between">
+                          <span>
+                            {item.quantity}× {item.name}
+                          </span>
+                          {item.unit_price && (
+                            <span className="text-neutral-500">
+                              ${(item.quantity * item.unit_price).toFixed(2)}
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="mt-3 space-y-1 text-sm border-t border-neutral-100 pt-2">
+                      <div className="flex justify-between text-neutral-500">
+                        <span>Subtotal productos</span>
+                        <span>${order.total.toFixed(2)}</span>
+                      </div>
+                      {order.delivery_fee != null && (
+                        <div className="flex justify-between text-neutral-500">
+                          <span>Envío</span>
+                          <span
+                            className={
+                              order.delivery_fee === 0
+                                ? "text-emerald-600 font-medium"
+                                : ""
+                            }
+                          >
+                            {order.delivery_fee === 0
+                              ? "¡Gratis!"
+                              : `$${order.delivery_fee.toFixed(2)}`}
+                          </span>
+                        </div>
+                      )}
+                      {order.discount && order.discount > 0 && (
+                        <div className="flex justify-between text-emerald-600 font-medium">
+                          <span>Descuento</span>
+                          <span>-${order.discount.toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between font-semibold text-neutral-900 border-t border-neutral-200 pt-1">
+                        <span>Total</span>
+                        <span>${total.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </div>
                 )}
 
                 {(next || showCancel) && (
