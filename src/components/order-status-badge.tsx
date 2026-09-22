@@ -9,7 +9,7 @@ const LABELS: Record<OrderStatus, string> = {
   cancelled: "Cancelado",
 };
 
-const COLORS: Record<OrderStatus, string> = {
+const STYLES: Record<OrderStatus, string> = {
   pending: "bg-amber-100 text-amber-700",
   accepted: "bg-blue-100 text-blue-700",
   preparing: "bg-blue-100 text-blue-700",
@@ -18,11 +18,21 @@ const COLORS: Record<OrderStatus, string> = {
   cancelled: "bg-red-100 text-red-700",
 };
 
+const DOT_STYLES: Record<OrderStatus, string> = {
+  pending: "bg-amber-500",
+  accepted: "bg-blue-500",
+  preparing: "bg-blue-500",
+  ready: "bg-indigo-500",
+  delivered: "bg-emerald-500",
+  cancelled: "bg-red-500",
+};
+
 export function OrderStatusBadge({ status }: { status: OrderStatus }) {
   return (
     <span
-      className={`rounded-full px-2 py-0.5 text-xs font-medium ${COLORS[status]}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${STYLES[status]}`}
     >
+      <span className={`h-1.5 w-1.5 rounded-full ${DOT_STYLES[status]}`} />
       {LABELS[status]}
     </span>
   );

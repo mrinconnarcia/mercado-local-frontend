@@ -79,8 +79,16 @@ export default function OrderDetailPage() {
     }
   };
 
-  if (!ready || loading)
-    return <p className="px-4 py-8 text-neutral-500">Cargando...</p>;
+  if (!ready || loading) {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-8">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 w-40 rounded bg-neutral-200" />
+          <div className="h-32 rounded-xl bg-neutral-100" />
+        </div>
+      </div>
+    );
+  }
   if (error && !order)
     return (
       <div className="mx-auto max-w-2xl px-4 py-8">
@@ -96,12 +104,14 @@ export default function OrderDetailPage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-neutral-900">
+        <h1 className="font-serif text-2xl text-neutral-900">
           Pedido #{order.id}
         </h1>
         <OrderStatusBadge status={order.status} />
       </div>
-      <p className="mt-1 text-sm text-neutral-500">{order.business.toString()}</p>
+      <p className="mt-1 text-sm text-neutral-500">
+        {order.business.toString()}
+      </p>
 
       {error && (
         <div className="mt-4">
@@ -109,13 +119,13 @@ export default function OrderDetailPage() {
         </div>
       )}
 
-      <div className="mt-6 divide-y divide-neutral-200 rounded-lg border border-neutral-200 bg-white">
+      <div className="mt-6 divide-y divide-neutral-100 rounded-xl border border-neutral-200 bg-white">
         {order.items.map((item) => (
           <div
             key={item.product_id}
             className="flex items-center justify-between px-4 py-3 text-sm"
           >
-            <span className="text-neutral-500">
+            <span className="text-neutral-600">
               {item.quantity}× {item.name}
             </span>
             <span className="text-neutral-600">
@@ -125,11 +135,15 @@ export default function OrderDetailPage() {
         ))}
         <div className="flex items-center justify-between px-4 py-3 text-sm">
           <span className="text-neutral-500">Envío</span>
-          <span className="text-neutral-600">${order.delivery_fee.toFixed(2)}</span>
+          <span className="text-neutral-600">
+            ${order.delivery_fee.toFixed(2)}
+          </span>
         </div>
-        <div className="flex items-center justify-between px-4 py-3 font-semibold">
-          <span className="text-neutral-500">Total</span>
-          <span className="text-neutral-600">${order.total_with_delivery.toFixed(2)}</span>
+        <div className="flex items-center justify-between rounded-b-xl bg-neutral-50 px-4 py-3 font-semibold">
+          <span className="text-neutral-700">Total</span>
+          <span className="text-neutral-900">
+            ${order.total_with_delivery.toFixed(2)}
+          </span>
         </div>
       </div>
 
@@ -146,24 +160,36 @@ export default function OrderDetailPage() {
       )}
 
       {reviewSent && (
-        <p className="mt-8 text-sm text-emerald-700">¡Gracias por tu reseña!</p>
+        <div className="mt-8 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          <CheckIcon />
+          ¡Gracias por tu reseña!
+        </div>
       )}
 
       {canReview && (
-        <div className="mt-8 border-t border-neutral-200 pt-6">
-          <h2 className="font-semibold text-neutral-900">Dejar una reseña</h2>
-          <div className="mt-3 flex flex-col gap-3">
-            <select
-              value={rating}
-              onChange={(e) => setRating(Number(e.target.value))}
-              className="w-32 rounded-md border border-neutral-300 px-3 py-2 text-sm"
-            >
-              {[5, 4, 3, 2, 1].map((n) => (
-                <option key={n} value={n}>
-                  {n} estrella{n > 1 ? "s" : ""}
-                </option>
-              ))}
-            </select>
+        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-5">
+          <h2 className="font-serif text-lg text-neutral-900">
+            Dejar una reseña
+          </h2>
+          <div className="mt-4 flex flex-col gap-4">
+            <div>
+              <p className="mb-1.5 text-sm font-medium text-neutral-700">
+                Tu calificación
+              </p>
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => setRating(n)}
+                    aria-label={`${n} estrella${n > 1 ? "s" : ""}`}
+                    className="p-0.5 text-amber-400 transition-transform hover:scale-110"
+                  >
+                    <StarIcon filled={n <= rating} className="h-7 w-7" />
+                  </button>
+                ))}
+              </div>
+            </div>
             <TextareaField
               id="comment"
               label="Comentario (opcional)"
@@ -182,5 +208,43 @@ export default function OrderDetailPage() {
         </div>
       )}
     </div>
+  );
+}
+
+function StarIcon({
+  filled,
+  className = "h-4 w-4",
+}: {
+  filled?: boolean;
+  className?: string;
+}) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill={filled ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m12 2 2.9 6.6 7.1.6-5.4 4.7 1.7 6.9L12 17.3 5.7 20.8l1.7-6.9L2 9.2l7.1-.6L12 2Z" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className="h-4 w-4 shrink-0"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m5 13 4 4L19 7" />
+    </svg>
   );
 }

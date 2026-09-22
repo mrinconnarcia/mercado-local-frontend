@@ -15,13 +15,11 @@ function HomeContent() {
   const q = searchParams.get("q") ?? "";
 
   const [categories, setCategories] = useState<Category[]>([]);
-  // Garantizamos que el estado inicial sea siempre un array vacío
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState(q);
 
-  // Categorías se piden una sola vez.
   useEffect(() => {
     categoriesApi
       .list()
@@ -29,7 +27,6 @@ function HomeContent() {
       .catch(() => {});
   }, []);
 
-  // Negocios se re-piden cada vez que cambia el filtro.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
@@ -47,7 +44,7 @@ function HomeContent() {
             ? err.message
             : "No se pudieron cargar los negocios.",
         );
-        setBusinesses([]); // Aseguramos array vacío en caso de error
+        setBusinesses([]);
       })
       .finally(() => setLoading(false));
   }, [categoryId, q]);

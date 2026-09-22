@@ -7,6 +7,7 @@ import { useAuth } from "@/src/lib/auth-context";
 import { ApiError } from "@/src/lib/api";
 import { Button } from "@/src/components/ui/button";
 import { ErrorBanner, TextField } from "@/src/components/ui/field";
+import { AuthShell } from "@/src/components/auth/auth-shell";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -37,59 +38,13 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-gradient-to-b from-emerald-50 via-white to-white px-4 py-10 sm:py-16">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 flex flex-col items-center gap-3 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 text-lg font-bold text-white shadow-sm">
-            L
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-neutral-900">
-              Iniciar sesión
-            </h1>
-            <p className="mt-1 text-sm text-neutral-500">
-              Ingresá a tu cuenta para continuar
-            </p>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm sm:p-8">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            {error && <ErrorBanner message={error} />}
-
-            <TextField
-              id="email"
-              label="Email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <TextField
-              id="password"
-              label="Contraseña"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-
-            <Button type="submit" loading={loading} className="mt-2 w-full">
-              Entrar
-            </Button>
-          </form>
-        </div>
-
-        <p className="text-right text-sm">
-          <Link
-            href="/olvide-password"
-            className="text-emerald-700 hover:underline"
-          >
-            ¿Olvidaste tu contraseña?
-          </Link>
-        </p>
-
-        <p className="mt-6 text-center text-sm text-neutral-600">
+    <AuthShell
+      heading="Tu mercado local, a un clic de distancia"
+      subheading="Conectá con negocios de tu zona y hacé tus compras con confianza, de principio a fin."
+      formTitle="Iniciar sesión"
+      formSubtitle="Ingresá tus datos para continuar."
+      footer={
+        <p className="text-center text-sm text-neutral-600">
           ¿No tenés cuenta?{" "}
           <Link
             href="/registro"
@@ -98,7 +53,45 @@ export default function LoginPage() {
             Registrate
           </Link>
         </p>
-      </div>
-    </main>
+      }
+    >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+        {error && <ErrorBanner message={error} />}
+
+        <TextField
+          id="email"
+          label="Email"
+          type="email"
+          autoComplete="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <div className="flex flex-col gap-1.5">
+          <TextField
+            id="password"
+            label="Contraseña"
+            type="password"
+            autoComplete="current-password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <div className="text-right">
+            <Link
+              href="/olvide-password"
+              className="text-sm text-emerald-700 hover:underline"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
+        </div>
+
+        <Button type="submit" loading={loading} className="mt-2 w-full">
+          Entrar
+        </Button>
+      </form>
+    </AuthShell>
   );
 }

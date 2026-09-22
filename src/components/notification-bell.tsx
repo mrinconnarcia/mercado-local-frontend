@@ -74,27 +74,27 @@ export function NotificationBell() {
     <div className="relative" ref={ref}>
       <button
         onClick={toggle}
-        className="relative rounded-md p-1.5 text-neutral-600 hover:bg-neutral-100"
+        className="relative rounded-lg p-2 text-neutral-600 hover:bg-neutral-100"
         aria-label="Notificaciones"
       >
-        🔔
+        <BellIcon />
         {unreadCount > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
+          <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 z-10 mt-2 w-80 rounded-lg border border-neutral-200 bg-white shadow-lg">
-          <div className="flex items-center justify-between border-b border-neutral-100 px-3 py-2">
+        <div className="absolute right-0 z-10 mt-2 w-80 rounded-xl border border-neutral-200 bg-white shadow-lg shadow-neutral-900/10">
+          <div className="flex items-center justify-between border-b border-neutral-100 px-3.5 py-2.5">
             <span className="text-sm font-semibold text-neutral-900">
               Notificaciones
             </span>
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
-                className="text-xs text-emerald-700 hover:underline"
+                className="text-xs font-medium text-emerald-700 hover:underline"
               >
                 Marcar todas leídas
               </button>
@@ -103,19 +103,22 @@ export function NotificationBell() {
 
           <div className="max-h-96 divide-y divide-neutral-50 overflow-y-auto">
             {loading && !loaded ? (
-              <p className="px-3 py-4 text-center text-sm text-neutral-500">
+              <p className="px-3 py-6 text-center text-sm text-neutral-500">
                 Cargando...
               </p>
             ) : notifications.length === 0 ? (
-              <p className="px-3 py-4 text-center text-sm text-neutral-500">
-                No tenés notificaciones.
-              </p>
+              <div className="flex flex-col items-center gap-2 px-3 py-8 text-center">
+                <BellIcon className="h-6 w-6 text-neutral-300" />
+                <p className="text-sm text-neutral-500">
+                  No tenés notificaciones.
+                </p>
+              </div>
             ) : (
               notifications.map((n) => (
                 <button
                   key={n.id}
                   onClick={() => !n.read && markRead(n.id)}
-                  className={`relative block w-full px-3 py-2.5 text-left text-sm ${
+                  className={`relative block w-full px-3.5 py-2.5 text-left text-sm ${
                     n.read ? "bg-white" : "bg-emerald-50/60"
                   } hover:bg-neutral-50`}
                 >
@@ -146,5 +149,22 @@ export function NotificationBell() {
         </div>
       )}
     </div>
+  );
+}
+
+function BellIcon({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={className}
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+    </svg>
   );
 }

@@ -6,6 +6,7 @@ import { authApi } from "@/src/lib/endpoints";
 import { ApiError } from "@/src/lib/api";
 import { Button } from "@/src/components/ui/button";
 import { ErrorBanner, TextField } from "@/src/components/ui/field";
+import { AuthShell } from "@/src/components/auth/auth-shell";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -34,27 +35,53 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="mx-auto flex max-w-sm flex-col gap-6 px-4 py-16">
-      <h1 className="text-2xl font-bold text-neutral-900">
-        Recuperar contraseña
-      </h1>
-
-      {sent ? (
-        <p className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-          Si ese email está registrado, te enviamos instrucciones para
-          restablecer tu contraseña. Revisá tu bandeja de entrada.
+    <AuthShell
+      heading="Recuperemos tu acceso"
+      subheading="Te mandamos un enlace seguro para que vuelvas a entrar a tu cuenta en un par de minutos."
+      formTitle="Recuperar contraseña"
+      formSubtitle="Ingresá el email con el que te registraste."
+      footer={
+        <p className="text-center text-sm text-neutral-600">
+          <Link href="/login" className="text-emerald-700 hover:underline">
+            Volver a iniciar sesión
+          </Link>
         </p>
-      ) : (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {error && <ErrorBanner message={error} />}
-          <p className="text-sm text-neutral-600">
-            Ingresá el email con el que te registraste y te mandamos un enlace
-            para restablecer tu contraseña.
+      }
+    >
+      {sent ? (
+        <div className="flex flex-col items-start gap-3">
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              className="h-5 w-5"
+              stroke="currentColor"
+              strokeWidth={1.75}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="m3 7 9 6 9-6" />
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+            </svg>
+          </span>
+          <p className="text-sm leading-relaxed text-neutral-700">
+            Si ese email está registrado, vas a recibir instrucciones para
+            restablecer tu contraseña. Revisá tu bandeja de entrada y la carpeta
+            de spam.
           </p>
+        </div>
+      ) : (
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-4"
+          noValidate
+        >
+          {error && <ErrorBanner message={error} />}
           <TextField
             id="email"
             label="Email"
             type="email"
+            autoComplete="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -64,12 +91,6 @@ export default function ForgotPasswordPage() {
           </Button>
         </form>
       )}
-
-      <p className="text-sm text-neutral-600">
-        <Link href="/login" className="text-emerald-700 hover:underline">
-          Volver a iniciar sesión
-        </Link>
-      </p>
-    </div>
+    </AuthShell>
   );
 }
