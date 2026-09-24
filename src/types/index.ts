@@ -161,8 +161,13 @@ export interface SalesReport {
     id: number;
     customer: string;
     total: number;
+    discount?: number;
     delivered_at: string;
-    items: Array<{ name: string; quantity: number }>;
+    items: Array<{
+      name: string;
+      quantity: number;
+      unit_price?: number;
+    }>;
   }>;
 }
 

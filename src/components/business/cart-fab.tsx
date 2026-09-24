@@ -1,6 +1,6 @@
 "use client";
 
-import { BagIcon } from "@/src/components/business/icons";
+import { ShoppingBag } from "lucide-react";
 import type { OrderDetail } from "@/src/types";
 
 export function CartFab({
@@ -22,7 +22,7 @@ export function CartFab({
       className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-emerald-700 py-3 pl-4 pr-5 text-white shadow-lg shadow-emerald-900/20 transition-transform hover:scale-[1.03] hover:bg-emerald-800 active:scale-100"
     >
       <span className="relative">
-        <BagIcon className="h-5 w-5" />
+        <ShoppingBag className="h-5 w-5" />
         <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold text-emerald-700">
           {itemCount > 9 ? "9+" : itemCount}
         </span>

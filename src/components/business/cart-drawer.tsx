@@ -1,6 +1,6 @@
 "use client";
 
-import { CloseIcon, PinIcon } from "@/src/components/business/icons";
+import { X, MapPin } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { ErrorBanner, TextField } from "@/src/components/ui/field";
 import type { OrderDetail } from "@/src/types";
@@ -66,7 +66,7 @@ export function CartDrawer({
             aria-label="Cerrar"
             className="rounded-lg p-1.5 text-neutral-500 hover:bg-neutral-100"
           >
-            <CloseIcon />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
@@ -107,7 +107,7 @@ export function CartDrawer({
                 onClick={onUseMyLocation}
                 className="flex w-fit items-center gap-1.5 text-xs font-medium text-emerald-700 hover:underline"
               >
-                <PinIcon />
+                <MapPin className="h-4 w-4" />
                 Usar mi ubicación actual
               </button>
               <Button

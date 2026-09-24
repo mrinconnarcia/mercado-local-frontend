@@ -76,7 +76,7 @@ export default function InventoryPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-neutral-900">Inventario</h1>
+      <h1 className="font-serif text-2xl text-neutral-900">Inventario</h1>
       <p className="mt-1 text-sm text-neutral-500">
         Acá ves todos tus productos, incluso los que no aparecen para los
         clientes.
@@ -89,49 +89,59 @@ export default function InventoryPage() {
       )}
 
       {loading ? (
-        <p className="mt-4 text-neutral-500">Cargando...</p>
+        <div className="mt-4 animate-pulse space-y-2">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-11 rounded-lg bg-neutral-100" />
+          ))}
+        </div>
+      ) : items.length === 0 ? (
+        <p className="mt-4 text-neutral-500">
+          Todavía no tenés productos cargados.
+        </p>
       ) : (
-        <table className="mt-4 w-full overflow-hidden rounded-lg border border-neutral-200 bg-white text-sm">
-          <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
-            <tr>
-              <th className="px-4 py-2">Producto</th>
-              <th className="px-4 py-2">Stock</th>
-              <th className="px-4 py-2">Disponible</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-neutral-100 text-neutral-700 ">
-            {items.map((item) => (
-              <tr key={item.id}>
-                <td className="px-4 py-2">{item.name}</td>
-                <td className="px-4 py-2">
-                  <input
-                    type="number"
-                    defaultValue={item.stock}
-                    disabled={savingId === item.id}
-                    onBlur={(e) => {
-                      const value = Number(e.target.value);
-                      if (value !== item.stock) updateStock(item, value);
-                    }}
-                    className="w-20 rounded-md border border-neutral-300 px-2 py-1"
-                  />
-                </td>
-                <td className="px-4 py-2">
-                  <button
-                    onClick={() => toggleAvailable(item)}
-                    disabled={savingId === item.id}
-                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                      item.available
-                        ? "bg-emerald-100 text-emerald-700"
-                        : "bg-neutral-100 text-neutral-500"
-                    }`}
-                  >
-                    {item.available ? "Sí" : "No"}
-                  </button>
-                </td>
+        <div className="mt-4 overflow-hidden rounded-xl border border-neutral-200 bg-white">
+          <table className="w-full text-sm">
+            <thead className="bg-neutral-50 text-left text-xs uppercase tracking-wide text-neutral-500">
+              <tr>
+                <th className="px-4 py-2.5">Producto</th>
+                <th className="px-4 py-2.5">Stock</th>
+                <th className="px-4 py-2.5">Disponible</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-neutral-100 text-neutral-700">
+              {items.map((item) => (
+                <tr key={item.id} className="hover:bg-neutral-50/60">
+                  <td className="px-4 py-2.5">{item.name}</td>
+                  <td className="px-4 py-2.5">
+                    <input
+                      type="number"
+                      defaultValue={item.stock}
+                      disabled={savingId === item.id}
+                      onBlur={(e) => {
+                        const value = Number(e.target.value);
+                        if (value !== item.stock) updateStock(item, value);
+                      }}
+                      className="w-20 rounded-lg border border-neutral-300 px-2 py-1 text-sm transition-colors focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20 disabled:opacity-50"
+                    />
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <button
+                      onClick={() => toggleAvailable(item)}
+                      disabled={savingId === item.id}
+                      className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
+                        item.available
+                          ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                          : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200"
+                      }`}
+                    >
+                      {item.available ? "Sí" : "No"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

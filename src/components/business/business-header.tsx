@@ -1,4 +1,4 @@
-import { PhoneIcon, PinIcon, StarIcon } from "@/src/components/business/icons";
+import { MapPin, Phone, Star } from "lucide-react";
 import type { Business } from "@/src/types";
 
 export function BusinessHeader({ business }: { business: Business }) {
@@ -17,7 +17,7 @@ export function BusinessHeader({ business }: { business: Business }) {
         </div>
         {business.average_rating != null && (
           <span className="flex shrink-0 items-center gap-1 text-sm font-medium text-amber-600">
-            <StarIcon />
+            <Star className="h-4 w-4" />
             {Number(business.average_rating).toFixed(1)}
           </span>
         )}
@@ -32,13 +32,13 @@ export function BusinessHeader({ business }: { business: Business }) {
       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-neutral-500">
         {business.address && (
           <span className="flex items-center gap-1.5">
-            <PinIcon />
+            <MapPin className="h-4 w-4" />
             {business.address}
           </span>
         )}
         {business.phone && (
           <span className="flex items-center gap-1.5">
-            <PhoneIcon />
+            <Phone className="h-4 w-4" />
             {business.phone}
           </span>
         )}

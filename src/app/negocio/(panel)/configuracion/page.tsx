@@ -96,8 +96,6 @@ export default function BusinessConfigPage() {
       if (discountPercentage)
         payload.discount_percentage = Number(discountPercentage);
 
-      console.log("Enviando payload:", payload);
-
       await businessesApi.update(business.id, payload);
       setSuccess("Configuración de envío y descuento actualizada.");
       refresh();
@@ -108,25 +106,39 @@ export default function BusinessConfigPage() {
     }
   };
 
-  if (!business) return <p className="text-neutral-500">Cargando...</p>;
+  if (!business) {
+    return (
+      <div className="animate-pulse space-y-3">
+        <div className="h-7 w-40 rounded bg-neutral-200" />
+        <div className="h-64 rounded-xl bg-neutral-100" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-2xl font-bold text-neutral-900">Configuración</h1>
+        <h1 className="font-serif text-2xl text-neutral-900">Configuración</h1>
         {error && (
           <div className="mt-4">
             <ErrorBanner message={error} />
           </div>
         )}
-        {success && <p className="mt-4 text-sm text-emerald-700">{success}</p>}
+        {success && (
+          <div className="mt-4 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+            <CheckIcon />
+            {success}
+          </div>
+        )}
       </div>
 
       <form
         onSubmit={handleSaveInfo}
-        className="flex flex-col gap-4 rounded-lg border border-neutral-200 bg-white p-4"
+        className="flex flex-col gap-4 rounded-xl border border-neutral-200 bg-white p-5"
       >
-        <h2 className="font-semibold text-neutral-900">Datos del negocio</h2>
+        <h2 className="font-serif text-lg text-neutral-900">
+          Datos del negocio
+        </h2>
         <TextField
           id="c_name"
           label="Nombre"
@@ -159,9 +171,9 @@ export default function BusinessConfigPage() {
 
       <form
         onSubmit={handleSaveDelivery}
-        className="flex flex-col gap-4 rounded-lg border border-neutral-200 bg-white p-4"
+        className="flex flex-col gap-4 rounded-xl border border-neutral-200 bg-white p-5"
       >
-        <h2 className="font-semibold text-neutral-900">
+        <h2 className="font-serif text-lg text-neutral-900">
           Zona y costo de envío
         </h2>
         <div className="flex gap-3">
@@ -181,8 +193,9 @@ export default function BusinessConfigPage() {
         <button
           type="button"
           onClick={useMyLocation}
-          className="w-fit text-left text-xs text-emerald-700 hover:underline"
+          className="flex w-fit items-center gap-1.5 text-left text-xs font-medium text-emerald-700 hover:underline"
         >
+          <PinIcon />
           Usar mi ubicación actual
         </button>
         <TextField
@@ -219,11 +232,11 @@ export default function BusinessConfigPage() {
           onChange={(e) => setFreeOver(e.target.value)}
         />
 
-        <div className="border-t border-neutral-200 pt-4 mt-2">
-          <h3 className="font-medium text-neutral-900 mb-3">
+        <div className="mt-2 border-t border-neutral-200 pt-4">
+          <h3 className="mb-1.5 font-medium text-neutral-900">
             Descuento general del negocio
           </h3>
-          <p className="text-xs text-neutral-500 mb-3">
+          <p className="mb-3 text-xs text-neutral-500">
             Aplica un descuento porcentual a todos los pedidos. Ej: 10 significa
             10% de descuento.
           </p>
@@ -244,5 +257,38 @@ export default function BusinessConfigPage() {
         </Button>
       </form>
     </div>
+  );
+}
+
+function PinIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className="h-3.5 w-3.5"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className="h-4 w-4 shrink-0"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m5 13 4 4L19 7" />
+    </svg>
   );
 }

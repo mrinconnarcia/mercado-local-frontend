@@ -6,16 +6,8 @@ import { useBusinessPanel } from "@/src/lib/business-context";
 import { ApiError } from "@/src/lib/api";
 import { Button } from "@/src/components/ui/button";
 import { ErrorBanner } from "@/src/components/ui/field";
+import { OrderStatusBadge } from "@/src/components/order-status-badge";
 import type { BusinessOrder, OrderStatus } from "@/src/types";
-
-const STATUS_LABEL: Record<OrderStatus, string> = {
-  pending: "Pendiente",
-  accepted: "Aceptado",
-  preparing: "Preparando",
-  ready: "Listo",
-  delivered: "Entregado",
-  cancelled: "Cancelado",
-};
 
 const NEXT_STATUS: Partial<
   Record<OrderStatus, { status: OrderStatus; label: string }>
@@ -85,17 +77,19 @@ export default function BusinessOrdersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-neutral-900">Pedidos recibidos</h1>
+      <h1 className="font-serif text-2xl text-neutral-900">
+        Pedidos recibidos
+      </h1>
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-wrap gap-1.5">
         {FILTERS.map((f) => (
           <button
             key={f.value}
             onClick={() => setFilter(f.value)}
-            className={`rounded-full px-3 py-1 text-xs font-medium ${
+            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
               filter === f.value
-                ? "bg-emerald-600 text-white"
-                : "bg-neutral-100 text-neutral-600"
+                ? "bg-emerald-700 text-white"
+                : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
             }`}
           >
             {f.label}
@@ -110,7 +104,14 @@ export default function BusinessOrdersPage() {
       )}
 
       {loading ? (
-        <p className="mt-4 text-neutral-500">Cargando...</p>
+        <div className="mt-4 flex flex-col gap-3">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-24 animate-pulse rounded-xl bg-neutral-100"
+            />
+          ))}
+        </div>
       ) : orders.length === 0 ? (
         <p className="mt-4 text-neutral-500">No hay pedidos con ese filtro.</p>
       ) : (
@@ -125,9 +126,9 @@ export default function BusinessOrdersPage() {
             return (
               <div
                 key={order.id}
-                className="rounded-lg border border-neutral-200 bg-white p-4"
+                className="rounded-xl border border-neutral-200 bg-white p-4"
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="font-medium text-neutral-900">
                       Pedido #{order.id} — {order.customer}
@@ -136,20 +137,18 @@ export default function BusinessOrdersPage() {
                       {new Date(order.created_at).toLocaleString()}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <span className="block font-semibold text-neutral-800">
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <span className="font-semibold text-neutral-900">
                       ${total.toFixed(2)}
                     </span>
-                    <span className="text-xs text-neutral-500">
-                      {STATUS_LABEL[order.status]}
-                    </span>
+                    <OrderStatusBadge status={order.status} />
                   </div>
                 </div>
 
                 {order.items && order.items.length > 0 && (
                   <button
                     onClick={() => setExpandedId(isExpanded ? null : order.id)}
-                    className="mt-2 text-xs text-emerald-700 hover:underline"
+                    className="mt-2 text-xs font-medium text-emerald-700 hover:underline"
                   >
                     {isExpanded ? "Ocultar detalles" : "Ver detalles"}
                   </button>
@@ -157,7 +156,7 @@ export default function BusinessOrdersPage() {
 
                 {isExpanded && order.items && (
                   <div className="mt-3 border-t border-neutral-100 pt-3">
-                    <ul className="text-sm text-neutral-600 space-y-1">
+                    <ul className="space-y-1 text-sm text-neutral-600">
                       {order.items.map((item, i) => (
                         <li key={i} className="flex justify-between">
                           <span>
@@ -172,7 +171,7 @@ export default function BusinessOrdersPage() {
                       ))}
                     </ul>
 
-                    <div className="mt-3 space-y-1 text-sm border-t border-neutral-100 pt-2">
+                    <div className="mt-3 space-y-1 border-t border-neutral-100 pt-2 text-sm">
                       <div className="flex justify-between text-neutral-500">
                         <span>Subtotal productos</span>
                         <span>${order.total.toFixed(2)}</span>
@@ -183,7 +182,7 @@ export default function BusinessOrdersPage() {
                           <span
                             className={
                               order.delivery_fee === 0
-                                ? "text-emerald-600 font-medium"
+                                ? "font-medium text-emerald-600"
                                 : ""
                             }
                           >
@@ -194,12 +193,12 @@ export default function BusinessOrdersPage() {
                         </div>
                       )}
                       {order.discount && order.discount > 0 && (
-                        <div className="flex justify-between text-emerald-600 font-medium">
+                        <div className="flex justify-between font-medium text-emerald-600">
                           <span>Descuento</span>
                           <span>-${order.discount.toFixed(2)}</span>
                         </div>
                       )}
-                      <div className="flex justify-between font-semibold text-neutral-900 border-t border-neutral-200 pt-1">
+                      <div className="flex justify-between border-t border-neutral-200 pt-1 font-semibold text-neutral-900">
                         <span>Total</span>
                         <span>${total.toFixed(2)}</span>
                       </div>

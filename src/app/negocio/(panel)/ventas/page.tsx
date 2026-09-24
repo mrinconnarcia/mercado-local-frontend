@@ -32,18 +32,19 @@ export default function SalesPage() {
       .finally(() => setLoading(false));
   };
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(load, [business]);
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-neutral-900">Ventas</h1>
+      <h1 className="font-serif text-2xl text-neutral-900">Ventas</h1>
 
       <form
         onSubmit={(e: FormEvent) => {
           e.preventDefault();
           load();
         }}
-        className="mt-4 flex items-end gap-3"
+        className="mt-4 flex flex-wrap items-end gap-3"
       >
         <TextField
           id="from"
@@ -69,51 +70,82 @@ export default function SalesPage() {
       )}
 
       {loading ? (
-        <p className="mt-4 text-neutral-500">Cargando...</p>
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:w-96">
+          {[1, 2].map((i) => (
+            <div
+              key={i}
+              className="h-20 animate-pulse rounded-xl bg-neutral-100"
+            />
+          ))}
+        </div>
       ) : report ? (
         <>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:w-96">
-            <div className="rounded-lg border border-neutral-200 bg-white p-4">
-              <p className="text-xs text-neutral-500">Ingresos</p>
-              <p className="mt-1 text-2xl font-bold text-neutral-900">
+            <div className="rounded-xl border border-neutral-200 bg-white p-4">
+              <p className="text-xs text-neutral-500">Ingresos totales</p>
+              <p className="mt-1 text-2xl font-semibold text-emerald-700">
                 ${report.total_revenue.toFixed(2)}
               </p>
             </div>
-            <div className="rounded-lg border border-neutral-200 bg-white p-4">
-              <p className="text-xs text-neutral-500">Pedidos</p>
-              <p className="mt-1 text-2xl font-bold text-neutral-900">
+            <div className="rounded-xl border border-neutral-200 bg-white p-4">
+              <p className="text-xs text-neutral-500">Pedidos entregados</p>
+              <p className="mt-1 text-2xl font-semibold text-neutral-900">
                 {report.count}
               </p>
             </div>
           </div>
 
-          <div className="mt-4 flex flex-col gap-2">
-            {report.sales.map((sale) => (
-              <div
-                key={sale.id}
-                className="rounded-lg border border-neutral-200 bg-white p-3 text-sm"
-              >
-                <div className="flex justify-between">
-                  <span className="font-medium">
-                    Pedido #{sale.id} — {sale.customer}
-                  </span>
-                  <span className="font-semibold">
-                    ${sale.total.toFixed(2)}
-                  </span>
+          {report.sales.length === 0 ? (
+            <p className="mt-4 text-sm text-neutral-500">
+              No hay ventas en ese rango de fechas.
+            </p>
+          ) : (
+            <div className="mt-4 flex flex-col gap-2">
+              {report.sales.map((sale) => (
+                <div
+                  key={sale.id}
+                  className="rounded-xl border border-neutral-200 bg-white p-4 text-sm"
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <span className="font-medium text-neutral-900">
+                        Pedido #{sale.id} — {sale.customer}
+                      </span>
+                      <p className="mt-0.5 text-xs text-neutral-500">
+                        {new Date(sale.delivered_at).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <span className="block font-semibold text-neutral-900">
+                        ${sale.total.toFixed(2)}
+                      </span>
+                      {/* ✅ Muestra el descuento si existió */}
+                      {sale.discount && sale.discount > 0 && (
+                        <span className="block text-xs text-emerald-600">
+                          (Incluye -$ {sale.discount.toFixed(2)} de descuento)
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <ul className="mt-3 space-y-1 border-t border-neutral-100 pt-2 text-xs text-neutral-600">
+                    {sale.items.map((item, i) => (
+                      <li key={i} className="flex justify-between">
+                        <span>
+                          {item.quantity}× {item.name}
+                        </span>
+                        {item.unit_price && (
+                          <span className="text-neutral-500">
+                            ${(item.quantity * item.unit_price).toFixed(2)}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <p className="mt-1 text-xs text-neutral-500">
-                  {new Date(sale.delivered_at).toLocaleString()}
-                </p>
-                <ul className="mt-1 text-xs text-neutral-600">
-                  {sale.items.map((item, i) => (
-                    <li key={i}>
-                      {item.quantity}× {item.name}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </>
       ) : null}
     </div>

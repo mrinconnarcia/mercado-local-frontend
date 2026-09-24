@@ -124,8 +124,8 @@ export default function ProductsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-neutral-900">Productos</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-serif text-2xl text-neutral-900">Productos</h1>
         {editingId === null && (
           <Button onClick={startCreate}>+ Nuevo producto</Button>
         )}
@@ -140,9 +140,9 @@ export default function ProductsPage() {
       {editingId !== null && (
         <form
           onSubmit={handleSubmit}
-          className="mt-4 flex flex-col gap-4 rounded-lg border border-neutral-200 bg-white p-4"
+          className="mt-4 flex flex-col gap-4 rounded-xl border border-neutral-200 bg-white p-5"
         >
-          <h2 className="font-semibold text-neutral-900">
+          <h2 className="font-serif text-lg text-neutral-900">
             {editingId === "new" ? "Nuevo producto" : "Editar producto"}
           </h2>
           <TextField
@@ -178,13 +178,14 @@ export default function ProductsPage() {
               onChange={(e) => setForm({ ...form, stock: e.target.value })}
             />
           </div>
-          <label className="flex items-center gap-2 text-sm text-neutral-700">
+          <label className="flex w-fit items-center gap-2 text-sm text-neutral-700">
             <input
               type="checkbox"
               checked={form.available}
               onChange={(e) =>
                 setForm({ ...form, available: e.target.checked })
               }
+              className="h-4 w-4 rounded border-neutral-300 text-emerald-700 focus:ring-emerald-600/30"
             />
             Disponible
           </label>
@@ -198,7 +199,7 @@ export default function ProductsPage() {
               onChange={(e) =>
                 setForm({ ...form, image: e.target.files?.[0] ?? null })
               }
-              className="mt-1 block text-sm"
+              className="mt-1.5 block w-full text-sm text-neutral-600 file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-neutral-700 hover:file:bg-neutral-200"
             />
           </div>
           <div className="flex gap-2">
@@ -217,29 +218,44 @@ export default function ProductsPage() {
       )}
 
       {loading ? (
-        <p className="mt-4 text-neutral-500">Cargando...</p>
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-48 animate-pulse rounded-xl bg-neutral-100"
+            />
+          ))}
+        </div>
+      ) : products.length === 0 ? (
+        <p className="mt-4 text-neutral-500">
+          Todavía no cargaste ningún producto.
+        </p>
       ) : (
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((p) => (
             <div
               key={p.id}
-              className="rounded-lg border border-neutral-200 bg-white p-4"
+              className="rounded-xl border border-neutral-200 bg-white p-4"
             >
               {p.image_url && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={p.image_url}
                   alt={p.name}
-                  className="mb-2 h-28 w-full rounded-md object-cover"
+                  className="mb-3 h-28 w-full rounded-lg object-cover"
                 />
               )}
               <h3 className="font-medium text-neutral-900">{p.name}</h3>
-              <div className="mt-1 flex items-center justify-between text-sm">
+              <div className="mt-1.5 flex items-center justify-between text-sm">
                 <span className="font-semibold text-emerald-700">
                   ${p.price.toFixed(2)}
                 </span>
                 <span
-                  className={p.available ? "text-neutral-500" : "text-red-500"}
+                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                    p.available
+                      ? "bg-neutral-100 text-neutral-600"
+                      : "bg-red-50 text-red-600"
+                  }`}
                 >
                   {p.available ? `Stock: ${p.stock}` : "No disponible"}
                 </span>
